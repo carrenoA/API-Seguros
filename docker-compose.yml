@@ -1,0 +1,23 @@
+services:
+  # broker
+  broker:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # Puerto de mensajería
+      - "15672:15672" # Interfaz de administración (http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  
+  # app Django
+  api:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///db.sqlite3
+      - BROKER_URL=amqp://guest:guest@broker:5672/
+    depends_on:
+      - broker
